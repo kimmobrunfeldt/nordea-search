@@ -1,0 +1,14 @@
+
+.transactions {
+    font-size: 10px;
+    font-family: Courier;
+}
+
+.large-input {
+    width: 95%;
+    height: 100px;
+}
+
+.tag-list {
+    width: 300px;
+}

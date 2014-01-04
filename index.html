@@ -4,16 +4,29 @@
   <head>
     <meta charset="utf-8">
     <meta name="description" content="Description" />
-    <title>Title</title>
+    <title></title>
 
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/main.css">
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/bacon.js/0.6.8/Bacon.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/underscore.string.js"></script>
+    <script src="js/moment.js"></script>
     <script src="js/main.js"></script>
   </head>
 
   <body>
+
+    <div class="money-sum-box">
+      <p id="total">0€</p>
+    </div>
+    <input class="tag-list" id="filter-words" type="text" placeholder="Search terms separated with space: market bar..">
+    <textarea class="large-input transactions" id="transaction-box"></textarea>
+    <div class="transactions" id="filtered">
+
+    </div>
 
   </body>
 
