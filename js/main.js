@@ -23,9 +23,17 @@ var Nordea = function($, _, moment) {
 
     function parseTransactionLine(line) {
         var words = _.str.words(line);
+        const [
+            logDate,
+            valueDate,
+            paymentDate,
+            amount,
+            receiver,
+        ] = line.split('\t');
+
         return {
-            date: moment(words[2], 'DD.MM.YYYY'),
-            amount: parseFloat(words[3].replace(',', '.')),
+            date: moment(paymentDate, 'DD.MM.YYYY'),
+            amount: parseFloat(amount.replace(',', '.')),
 
             // Remove the unnecessary dates from the beginning
             line: _.str.words(line).slice(2).join(' ')

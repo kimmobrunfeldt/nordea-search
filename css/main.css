@@ -4,6 +4,7 @@
 
 body {
   background: #f2eafb;
+  padding: 15px;
 }
 
 .transactions {
@@ -26,4 +27,8 @@ body {
   background: white;
   box-shadow: 0 0 40px #ccc;
   padding: 15px;
+}
+
+#total {
+  font-size: 24px;
 }
