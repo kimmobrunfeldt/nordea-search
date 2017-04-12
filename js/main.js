@@ -94,7 +94,7 @@ $(function () {
                     '<h4 class="transaction-item__receiver"><%= transaction.receiver %></h4>' + 
                     '<time class="transaction-item__date"><%= moment(transaction.date).format("LL") %></time>' + 
                 '</div>' +
-                '<strong><%= transaction.amount %></strong>' + 
+                '<strong><%= transaction.amount.toFixed(2) %></strong>' + 
             '<% }) %>';
 
         const html = _.template(template, {transactions});
