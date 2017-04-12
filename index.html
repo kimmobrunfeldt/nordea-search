@@ -14,18 +14,18 @@
     <script src="js/underscore.js"></script>
     <script src="js/underscore.string.js"></script>
     <script src="js/moment.js"></script>
-    <script src="js/main.js"></script>
   </head>
 
   <body>
     <div class="container">
-      <textarea class="large-input transactions" id="transaction-box"></textarea>
+      <input type="file" id="file">
       <input class="tag-list" id="filter-words" type="text" placeholder="Search terms separated with space: market bar..">
       <div class="money-sum-box">
         <p id="total">0€</p>
       </div>
       <ul class="transactions" id="filtered" />
     </div>
+    <script src="js/main.js"></script>
   </body>
 
 </html>

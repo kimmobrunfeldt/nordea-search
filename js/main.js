@@ -49,6 +49,16 @@ var Nordea = function($, _, moment) {
     return api;
 }(jQuery, _, moment);
 
+let fileData;
+document.getElementById('file').onchange = function() {
+  const file = this.files[0];
+
+  const reader = new FileReader();
+  reader.onload = function() {
+    fileData = this.result;
+  };
+  reader.readAsText(file);
+};
 
 $(function () {
     var Bank = Nordea;
@@ -121,19 +131,13 @@ $(function () {
     }
 
     function main() {
-        var transactionBox = $("#transaction-box");
-        var textChanges = transactionBox.asEventStream("input propertychange");
+        const fileChange = $('#file').asEventStream("change");
         var filterWordChanges = $("#filter-words").asEventStream("input propertychange");
+        var allChanges = Bacon.mergeAll(fileChange, filterWordChanges);
 
-        var allChanges = Bacon.mergeAll(textChanges, filterWordChanges);
-
-        // 300 ms after last change of anything, re-render info
         allChanges.debounce(300).onValue(function(e) {
-            render(transactionBox.val(), getFilters());
+            render(fileData, getFilters());
         });
-
-        // Initial render if the form happens to remember some values
-        render(transactionBox.val(), getFilters());
     }
 
     main();
