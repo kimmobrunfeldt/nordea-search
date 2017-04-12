@@ -90,8 +90,10 @@ $(function () {
         const template =
             '<% _.each(transactions, function(transaction) { %>' +
             '<li class="transaction-item">' +
-                '<h4><%= transaction.receiver %></h4>' + 
-                '<time><%= moment(transaction.date).format("LL") %></time>' + 
+                '<div class="transaction-item__left">' + 
+                    '<h4 class="transaction-item__receiver"><%= transaction.receiver %></h4>' + 
+                    '<time class="transaction-item__date"><%= moment(transaction.date).format("LL") %></time>' + 
+                '</div>' +
                 '<strong><%= transaction.amount %></strong>' + 
             '<% }) %>';
 
