@@ -1,3 +1,10 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: #f2eafb;
+}
 
 .transactions {
     font-size: 10px;
@@ -5,10 +12,18 @@
 }
 
 .large-input {
-    width: 95%;
-    height: 100px;
+  display: block;
+  height: 100px;
+  width: 100%;
 }
 
 .tag-list {
     width: 300px;
+}
+.container {
+  max-width: 968px;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 0 40px #ccc;
+  padding: 15px;
 }
