@@ -34,7 +34,7 @@ var Nordea = function($, _, moment) {
         return {
             date: moment(paymentDate, 'DD.MM.YYYY'),
             amount: parseFloat(amount.replace(',', '.')),
-
+            receiver,
             // Remove the unnecessary dates from the beginning
             line: _.str.words(line).slice(2).join(' ')
         };
@@ -88,11 +88,13 @@ $(function () {
 
     function renderTransactionList(transactions) {
         var context = {transactions: transactions};
-        var template = '<ul>   ' +
+        const template =
             '<% _.each(transactions, function(transaction) { %>' +
-            '<li><pre><%= transaction.line %></pre></li>' +
-            '<% }) %>' +
-            '</ul>';
+            '<li class="transaction-item">' +
+                '<h4><%= transaction.receiver %></h4>' + 
+                '<time><%= moment(transaction.date).format("LL") %></time>' + 
+                '<strong><%= transaction.amount %></strong>' + 
+            '<% }) %>';
 
         var html = _.template(template, context);
         $('#filtered').html(html);

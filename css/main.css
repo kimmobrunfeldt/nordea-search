@@ -8,8 +8,7 @@ body {
 }
 
 .transactions {
-    font-size: 10px;
-    font-family: Courier;
+  list-style: none;
 }
 
 .large-input {
@@ -31,4 +30,8 @@ body {
 
 #total {
   font-size: 24px;
+}
+
+.transaction-item {
+  padding: 10px 0;
 }
