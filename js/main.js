@@ -87,7 +87,6 @@ $(function () {
     }
 
     function renderTransactionList(transactions) {
-        var context = {transactions: transactions};
         const template =
             '<% _.each(transactions, function(transaction) { %>' +
             '<li class="transaction-item">' +
@@ -96,7 +95,7 @@ $(function () {
                 '<strong><%= transaction.amount %></strong>' + 
             '<% }) %>';
 
-        var html = _.template(template, context);
+        const html = _.template(template, {transactions});
         $('#filtered').html(html);
     }
 
