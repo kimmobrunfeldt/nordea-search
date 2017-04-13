@@ -132,9 +132,16 @@ $(function () {
 
     function main() {
         const fileChange = $('#file').asEventStream("change");
-        var filterWordChanges = $("#filter-words").asEventStream("input propertychange");
+        var filterWordChanges = $("#filter-words")
+            .asEventStream('keyup')
+            .debounce(200)
+            .map(event => event.target.value)
+            .skipDuplicates();
         var allChanges = Bacon.mergeAll(fileChange, filterWordChanges);
 
+        filterWordChanges.onValue(function(value) {
+            console.log('täsä value', value);
+        })
         allChanges.debounce(300).onValue(function(e) {
             render(fileData, getFilters());
         });
