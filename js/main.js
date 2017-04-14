@@ -51,8 +51,7 @@ $(function () {
     var config = Config;
 
     function filterTransaction(transaction, filters) {
-        var caseSensitive = filters.caseSensitive;
-        var line = caseSensitive ? transaction.line : transaction.line.toLowerCase();
+        var line = filters.caseSensitive ? transaction.line : transaction.line.toLowerCase();
         var wordsFound = _.map(filters.words, function(word) {
             return _.str.include(line, word);
         });
