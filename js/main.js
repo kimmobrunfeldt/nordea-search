@@ -121,21 +121,21 @@ $(function () {
 
     function main() {
         const fileChange = $('#file')
-            .asEventStream("change")
-            .flatMap((event) => {
+            .asEventStream('change')
+            .flatMap(event => {
                 const reader = new FileReader();
                 reader.readAsText(event.target.files[0])
                 return Bacon.fromEventTarget(reader, 'load');
             })
-            .map((event) => event.target.result)
+            .map(event => event.target.result)
             .toProperty('');
-        const filterWordChanges = $("#filter-words")
+        const filterWordChanges = $('#filter-words')
             .asEventStream('keyup')
             .debounce(200)
             .map(event => event.target.value)
             .toProperty('')
 
-        const and = (a, b) => ({a: a, b: b});
+        const and = (a, b) => ({a, b});
         const renderResults = filterWordChanges.combine(fileChange, and);
 
         renderResults.onValue(val => {
