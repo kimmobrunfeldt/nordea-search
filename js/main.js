@@ -20,9 +20,7 @@ const Nordea = function(moment) {
     }
 
     function parseTransactionLine(line) {
-        const [
-            logDate,
-            valueDate,
+        const [, ,
             paymentDate,
             amount,
             receiver,
