@@ -138,8 +138,8 @@ $(function () {
         const and = (searchTermValue, fileContents) => ({searchTermValue, fileContents});
         const renderResults = searchTerm.combine(file, and);
 
-        renderResults.onValue(val => {
-            render(val.fileContents, getFilters(val.searchTermValue));
+        renderResults.onValue(({fileContents, searchTermValue}) => {
+            render(fileContents, getFilters(searchTermValue));
         });
     }
 
