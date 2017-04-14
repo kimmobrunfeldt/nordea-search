@@ -108,9 +108,9 @@ $(function () {
         $('#total').text(total.toFixed(2) + ' ' + config.currencies[config.currency]);
     }
 
-    function getFilters() {
+    function getFilters(words) {
         return {
-            words: _.str.words($('#filter-words').val()),
+            words: _.str.words(words),
             caseSensitive: false,
             minAmount: -Infinity,
             maxAmount: Infinity,
@@ -125,26 +125,23 @@ $(function () {
             .asEventStream('keyup')
             .debounce(200)
             .map(event => event.target.value)
-            .skipDuplicates();
-        var allChanges = Bacon.mergeAll(filterWordChanges);
+            .toProperty('')
 
-        filterWordChanges.onValue(function(value) {
-            console.log('täsä value', value);
-        })
-        allChanges.debounce(300).onValue(function(e) {
-            render(fileData, getFilters());
-        });
-
-        fileChange
+        const fileResult = fileChange
             .flatMap((event) => {
                 const reader = new FileReader();
                 reader.readAsText(event.target.files[0])
                 return Bacon.fromEventTarget(reader, 'load');
             })
             .map((event) => event.target.result)
-            .onValue(val => {
-                render(val, getFilters());
-            });
+            .toProperty('');
+
+        const and = (a, b) => ({a: a, b: b});
+        const renderResults = filterWordChanges.combine(fileResult, and);
+
+        renderResults.onValue(val => {
+            render(val.b, getFilters(val.a));
+        });
     }
 
     main();
