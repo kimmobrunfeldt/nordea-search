@@ -17,8 +17,8 @@ var Nordea = function($, _, moment) {
     var api = {};
 
     function isLineTransaction(line) {
-        // If line is not empty and first word contains dot(it's a date)
-        return line && _.str.include(_.str.words(line)[0], '.');
+        const [date] = line.split('\t');
+        return moment(date, 'DD.MM.YYYY').isValid();
     }
 
     function parseTransactionLine(line) {
