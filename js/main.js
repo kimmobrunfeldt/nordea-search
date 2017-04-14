@@ -34,7 +34,7 @@ var Nordea = function($, _, moment) {
             amount: parseFloat(amount.replace(',', '.')),
             receiver,
             // Remove the unnecessary dates from the beginning
-            line: _.str.words(line).slice(2).join(' ')
+            line: words.slice(2).join(' ')
         };
     }
 
