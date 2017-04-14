@@ -120,14 +120,8 @@ $(function () {
     }
 
     function main() {
-        const fileChange = $('#file').asEventStream("change");
-        var filterWordChanges = $("#filter-words")
-            .asEventStream('keyup')
-            .debounce(200)
-            .map(event => event.target.value)
-            .toProperty('')
-
-        const fileResult = fileChange
+        const fileChange = $('#file')
+            .asEventStream("change")
             .flatMap((event) => {
                 const reader = new FileReader();
                 reader.readAsText(event.target.files[0])
@@ -135,9 +129,14 @@ $(function () {
             })
             .map((event) => event.target.result)
             .toProperty('');
+        const filterWordChanges = $("#filter-words")
+            .asEventStream('keyup')
+            .debounce(200)
+            .map(event => event.target.value)
+            .toProperty('')
 
         const and = (a, b) => ({a: a, b: b});
-        const renderResults = filterWordChanges.combine(fileResult, and);
+        const renderResults = filterWordChanges.combine(fileChange, and);
 
         renderResults.onValue(val => {
             render(val.b, getFilters(val.a));
