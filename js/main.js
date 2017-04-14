@@ -57,9 +57,9 @@ $(function () {
                (transaction.amount <= filters.maxAmount);
     }
 
-    const hasMatchReceiver = filters => t => {
+    const hasMatchReceiver = filters => transaction => {
         return filters.words.length ? filters.words.some(filterWord => {
-            return t.receiver.toLowerCase().includes(filterWord.toLowerCase());
+            return transaction.receiver.toLowerCase().includes(filterWord.toLowerCase());
         }) : true;
     };
 
