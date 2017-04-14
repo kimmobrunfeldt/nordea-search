@@ -120,26 +120,26 @@ $(function () {
     }
 
     function main() {
-        const fileChange = $('#file')
+        const file = $('#file')
             .asEventStream('change')
             .flatMap(event => {
                 const reader = new FileReader();
-                reader.readAsText(event.target.files[0])
+                reader.readAsText(event.target.files[0]);
                 return Bacon.fromEventTarget(reader, 'load');
             })
             .map(event => event.target.result)
             .toProperty('');
-        const filterWordChanges = $('#filter-words')
+        const searchTerm = $('#filter-words')
             .asEventStream('keyup')
             .debounce(200)
             .map(event => event.target.value)
-            .toProperty('')
+            .toProperty('');
 
-        const and = (a, b) => ({a, b});
-        const renderResults = filterWordChanges.combine(fileChange, and);
+        const and = (searchTermValue, fileContents) => ({searchTermValue, fileContents});
+        const renderResults = searchTerm.combine(file, and);
 
         renderResults.onValue(val => {
-            render(val.b, getFilters(val.a));
+            render(val.fileContents, getFilters(val.searchTermValue));
         });
     }
 
