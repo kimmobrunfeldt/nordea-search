@@ -47,3 +47,11 @@ body {
   font-size: 14px;
   color: #ccc;
 }
+
+.transaction-item__amount--expense {
+  color: #F57979;
+}
+
+.transaction-item__amount--income {
+  color: #5CDD7A;
+}

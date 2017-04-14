@@ -72,18 +72,18 @@ $(function () {
     }
 
     function renderTransactionList(transactions) {
-        const template =
-            '<% _.each(transactions, function(transaction) { %>' +
-            '<li class="transaction-item">' +
+        const template = transactions.reduce((acc, transaction) => {
+            const amountClass = transaction.amount > 0 ? 'transaction-item__amount--income' : 'transaction-item__amount--expense';
+            return acc + '<li class="transaction-item">' +
                 '<div class="transaction-item__left">' + 
-                    '<h4 class="transaction-item__receiver"><%= transaction.receiver %></h4>' + 
-                    '<time class="transaction-item__date"><%= moment(transaction.date).format("LL") %></time>' + 
+                    '<h4 class="transaction-item__receiver">' + transaction.receiver + '</h4>' + 
+                    '<time class="transaction-item__date">' + moment(transaction.date).format("LL") + '</time>' + 
                 '</div>' +
-                '<strong><%= transaction.amount.toFixed(2) %></strong>' + 
-            '<% }) %>';
+                '<strong class="' + amountClass + '">' + transaction.amount.toFixed(2) + '</strong>' + 
+            '</li>';
+        }, '');
 
-        const html = _.template(template, {transactions});
-        $('#filtered').html(html);
+        $('#filtered').html(template);
     }
 
     function renderTotalAmount(transactions) {
