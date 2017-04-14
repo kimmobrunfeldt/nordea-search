@@ -50,32 +50,28 @@ $(function () {
     var Bank = Nordea;
     var config = Config;
 
-    function filterTransaction(transaction, filters) {
-        var line = filters.caseSensitive ? transaction.line : transaction.line.toLowerCase();
-        var wordsFound = _.map(filters.words, function(word) {
-            return _.str.include(line, word);
-        });
-
-        return (_.any(wordsFound) || filters.words.length === 0) &&
-               isAmountInBoundaries(transaction, filters) &&
-               isDateInBoundaries(transaction, filters);
-    }
-
-    function isDateInBoundaries(transaction, filters) {
+    const isDateInBoundaries = filters => transaction => {
         return (transaction.date >= filters.minDate) &&
                (transaction.date <= filters.maxDate);
     }
 
-    function isAmountInBoundaries(transaction, filters) {
+    const isAmountInBoundaries = filters => transaction => {
         return (transaction.amount >= filters.minAmount) &&
                (transaction.amount <= filters.maxAmount);
     }
 
-    function render(transactions, filters) {
-        var filteredTransactions = _.filter(transactions, function(t) {
-            return filterTransaction(t, filters);
-        });
+    const hasMatchReceiver = filters => t => {
+        return filters.words.length ? filters.words.some(filterWord => {
+            return t.receiver.toLowerCase().includes(filterWord.toLowerCase());
+        }) : true;
+    };
 
+    function render(transactions, filters) {
+        const filteredTransactions = transactions
+            .filter(hasMatchReceiver(filters))
+            .filter(isDateInBoundaries(filters))
+            .filter(isAmountInBoundaries(filters))
+            
         renderTransactionList(filteredTransactions);
         renderTotalAmount(filteredTransactions);
     }
@@ -124,7 +120,7 @@ $(function () {
             })
             .map(event => event.target.result)
             .map(Bank.parseTransactions)
-            .toProperty('');
+            .toProperty([]);
         const searchTerm = $('#filter-words')
             .asEventStream('keyup')
             .debounce(200)
