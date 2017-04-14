@@ -49,17 +49,6 @@ var Nordea = function($, _, moment) {
     return api;
 }(jQuery, _, moment);
 
-let fileData;
-document.getElementById('file').onchange = function() {
-  const file = this.files[0];
-
-  const reader = new FileReader();
-  reader.onload = function() {
-    fileData = this.result;
-  };
-  reader.readAsText(file);
-};
-
 $(function () {
     var Bank = Nordea;
     var config = Config;
@@ -137,7 +126,7 @@ $(function () {
             .debounce(200)
             .map(event => event.target.value)
             .skipDuplicates();
-        var allChanges = Bacon.mergeAll(fileChange, filterWordChanges);
+        var allChanges = Bacon.mergeAll(filterWordChanges);
 
         filterWordChanges.onValue(function(value) {
             console.log('täsä value', value);
@@ -145,6 +134,17 @@ $(function () {
         allChanges.debounce(300).onValue(function(e) {
             render(fileData, getFilters());
         });
+
+        fileChange
+            .flatMap((event) => {
+                const reader = new FileReader();
+                reader.readAsText(event.target.files[0])
+                return Bacon.fromEventTarget(reader, 'load');
+            })
+            .map((event) => event.target.result)
+            .onValue(val => {
+                render(val, getFilters());
+            });
     }
 
     main();
