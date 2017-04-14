@@ -75,8 +75,7 @@ $(function () {
                (transaction.amount <= filters.maxAmount);
     }
 
-    function render(text, filters) {
-        var transactions = Bank.parseTransactions(text);
+    function render(transactions, filters) {
         var filteredTransactions = _.filter(transactions, function(t) {
             return filterTransaction(t, filters);
         });
@@ -128,6 +127,7 @@ $(function () {
                 return Bacon.fromEventTarget(reader, 'load');
             })
             .map(event => event.target.result)
+            .map(Bank.parseTransactions)
             .toProperty('');
         const searchTerm = $('#filter-words')
             .asEventStream('keyup')
