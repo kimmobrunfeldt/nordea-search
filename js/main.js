@@ -13,7 +13,7 @@ var Config = function() {
     return config;
 }();
 
-var Nordea = function($, _, moment) {
+const Nordea = function(moment) {
     function isLineTransaction(line) {
         const [date] = line.split('\t');
         return moment(date, 'DD.MM.YYYY').isValid();
@@ -41,7 +41,7 @@ var Nordea = function($, _, moment) {
         .map(parseTransactionLine);
 
     return {parseTransactions};
-}(jQuery, _, moment);
+}(moment);
 
 $(function () {
     var Bank = Nordea;
