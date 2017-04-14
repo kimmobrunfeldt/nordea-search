@@ -40,11 +40,10 @@ var Nordea = function($, _, moment) {
         };
     }
 
-    api.parseTransactions = function(text) {
-        var lines = _.str.lines(text);
-        var transactionLines = _.filter(lines, isLineTransaction);
-        return _.map(transactionLines, parseTransactionLine);
-    };
+    api.parseTransactions = text => text
+        .split('\n')
+        .filter(isLineTransaction)
+        .map(parseTransactionLine);
 
     return api;
 }(jQuery, _, moment);
