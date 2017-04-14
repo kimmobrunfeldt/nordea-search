@@ -14,8 +14,6 @@ var Config = function() {
 }();
 
 var Nordea = function($, _, moment) {
-    var api = {};
-
     function isLineTransaction(line) {
         const [date] = line.split('\t');
         return moment(date, 'DD.MM.YYYY').isValid();
@@ -40,12 +38,12 @@ var Nordea = function($, _, moment) {
         };
     }
 
-    api.parseTransactions = text => text
+    parseTransactions = text => text
         .split('\n')
         .filter(isLineTransaction)
         .map(parseTransactionLine);
 
-    return api;
+    return {parseTransactions};
 }(jQuery, _, moment);
 
 $(function () {
