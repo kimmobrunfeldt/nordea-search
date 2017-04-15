@@ -88,7 +88,7 @@ $(function () {
 
     function getFilters(words) {
         return {
-            searchTerms: _.str.words(words),
+            searchTerms: words.split(' '),
             caseSensitive: false,
             minAmount: -Infinity,
             maxAmount: Infinity,
