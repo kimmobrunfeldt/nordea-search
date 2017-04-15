@@ -82,10 +82,7 @@ $(function () {
     }
 
     function renderTotalAmount(transactions) {
-        var total = _.reduce(transactions, function(memo, t) {
-            return memo + t.amount;
-        }, 0);
-
+        const total = transactions.reduce((memo, t) => memo + t.amount, 0);
         $('#total').text(total.toFixed(2) + ' ' + config.currencies[config.currency]);
     }
 
