@@ -57,15 +57,15 @@ $(function () {
                (transaction.amount <= filters.maxAmount);
     }
 
-    const hasMatchReceiver = filters => transaction => {
-        return filters.words.length ? filters.words.some(filterWord => {
-            return transaction.receiver.toLowerCase().includes(filterWord.toLowerCase());
+    const includesSearchTerm = searchTerms => transaction => {
+        return searchTerms.length ? searchTerms.some(searchTerm => {
+            return transaction.receiver.toLowerCase().includes(searchTerm.toLowerCase());
         }) : true;
     };
 
     function render(transactions, filters) {
         const filteredTransactions = transactions
-            .filter(hasMatchReceiver(filters))
+            .filter(includesSearchTerm(filters.searchTerms))
             .filter(isDateInBoundaries(filters))
             .filter(isAmountInBoundaries(filters))
             
@@ -98,7 +98,7 @@ $(function () {
 
     function getFilters(words) {
         return {
-            words: _.str.words(words),
+            searchTerms: _.str.words(words),
             caseSensitive: false,
             minAmount: -Infinity,
             maxAmount: Infinity,
