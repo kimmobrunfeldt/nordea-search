@@ -47,15 +47,8 @@ $(function () {
     var Bank = Nordea;
     var config = Config;
 
-    const isDateInBoundaries = filters => transaction => {
-        return (transaction.date >= filters.minDate) &&
-               (transaction.date <= filters.maxDate);
-    }
-
-    const isAmountInBoundaries = filters => transaction => {
-        return (transaction.amount >= filters.minAmount) &&
-               (transaction.amount <= filters.maxAmount);
-    }
+    const isBetween = (min, max) => transaction =>
+        transaction.amount >= min && transaction.amount <= max;
 
     const includesSearchTerm = searchTerms => transaction => {
         return searchTerms.length ? searchTerms.some(searchTerm => {
@@ -66,8 +59,8 @@ $(function () {
     function render(transactions, filters) {
         const filteredTransactions = transactions
             .filter(includesSearchTerm(filters.searchTerms))
-            .filter(isDateInBoundaries(filters))
-            .filter(isAmountInBoundaries(filters))
+            .filter(isBetween(filters.minDate, filters.maxDate))
+            .filter(isBetween(filters.minAmount, filters.maxAmount))
             
         renderTransactionList(filteredTransactions);
         renderTotalAmount(filteredTransactions);
