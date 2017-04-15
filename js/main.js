@@ -24,12 +24,14 @@ const Nordea = function(moment) {
             paymentDate,
             amount,
             receiver,
+            , ,
+            paymentType,
         ] = line.split('\t');
 
         return {
             date: moment(paymentDate, 'DD.MM.YYYY'),
             amount: parseFloat(amount.replace(',', '.')),
-            receiver,
+            receiver: paymentType.includes('otto') ? paymentType : receiver,
         };
     }
 
