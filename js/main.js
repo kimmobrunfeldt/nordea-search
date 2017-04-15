@@ -50,7 +50,7 @@ $(function () {
     const isBetween = (min, max) => transaction =>
         transaction.amount >= min && transaction.amount <= max;
 
-    const includesSearchTerm = searchTerms => transaction => {
+    const includesSomeSearchTerm = searchTerms => transaction => {
         return searchTerms.length ? searchTerms.some(searchTerm => {
             return transaction.receiver.toLowerCase().includes(searchTerm.toLowerCase());
         }) : true;
@@ -58,7 +58,7 @@ $(function () {
 
     function render(transactions, filters) {
         const filteredTransactions = transactions
-            .filter(includesSearchTerm(filters.searchTerms))
+            .filter(includesSomeSearchTerm(filters.searchTerms))
             .filter(isBetween(filters.minDate, filters.maxDate))
             .filter(isBetween(filters.minAmount, filters.maxAmount))
             
