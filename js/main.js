@@ -151,7 +151,7 @@ $(function () {
             return [];
         }, file, bankRadioButton);
 
-        const filteredLols = Bacon.combineWith((transactions, searchTermValue) => {
+        Bacon.combineWith((transactions, searchTermValue) => {
             const filters = getFilters(searchTermValue);
             return transactions
                 .filter(includesSomeSearchTerm(filters.searchTerms))
