@@ -113,6 +113,11 @@ $(function () {
             .debounce(200)
             .map(event => event.target.value)
             .toProperty('');
+        const bankRadioButton = $('[name="bank"]')
+            .asEventStream('change')
+            .map(event => event.target.value)
+            .toProperty('nordea')
+            .log();
 
         const and = (searchTermValue, fileContents) => ({searchTermValue, fileContents});
         const renderResults = searchTerm.combine(file, and);
