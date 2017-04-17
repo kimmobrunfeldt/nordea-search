@@ -43,6 +43,35 @@ const Nordea = function(moment) {
     return {parseTransactions};
 }(moment);
 
+const Op = function(moment) {
+    function isLineTransaction(line) {
+        const [date] = line.split(';');
+        return moment(date, 'DD.MM.YYYY').isValid();
+    }
+
+    function parseTransactionLine(line) {
+        const [,
+            paymentDate,
+            amount,
+            , ,
+            receiver,
+        ] = line.split(';');
+
+        return {
+            date: moment(paymentDate, 'DD.MM.YYYY'),
+            amount: parseFloat(amount.replace(',', '.')),
+            receiver,
+        };
+    }
+
+    parseTransactions = text => text
+        .split('\n')
+        .filter(isLineTransaction)
+        .map(parseTransactionLine);
+
+    return {parseTransactions};
+}(moment);
+
 $(function () {
     var Bank = Nordea;
     var config = Config;
@@ -56,14 +85,9 @@ $(function () {
         }) : true;
     };
 
-    function render(transactions, filters) {
-        const filteredTransactions = transactions
-            .filter(includesSomeSearchTerm(filters.searchTerms))
-            .filter(isBetween(filters.minDate, filters.maxDate))
-            .filter(isBetween(filters.minAmount, filters.maxAmount))
-            
-        renderTransactionList(filteredTransactions);
-        renderTotalAmount(filteredTransactions);
+    function render(transactions) {
+        renderTransactionList(transactions);
+        renderTotalAmount(transactions);
     }
 
     function renderTransactionList(transactions) {
@@ -106,8 +130,7 @@ $(function () {
                 return Bacon.fromEventTarget(reader, 'load');
             })
             .map(event => event.target.result)
-            .map(Bank.parseTransactions)
-            .toProperty([]);
+            .toProperty('');
         const searchTerm = $('#filter-words')
             .asEventStream('keyup')
             .debounce(200)
@@ -116,15 +139,26 @@ $(function () {
         const bankRadioButton = $('[name="bank"]')
             .asEventStream('change')
             .map(event => event.target.value)
-            .toProperty('nordea')
-            .log();
+            .toProperty('nordea');
 
-        const and = (searchTermValue, fileContents) => ({searchTermValue, fileContents});
-        const renderResults = searchTerm.combine(file, and);
+        const parsedFile = Bacon.combineWith((fileValue, bankRadio) => {
+            if (bankRadio === 'nordea') {
+                return Nordea.parseTransactions(fileValue)
+            }
+            else if (bankRadio === 'op') {
+                return Op.parseTransactions(fileValue)
+            }
+            return [];
+        }, file, bankRadioButton);
 
-        renderResults.onValue(({fileContents, searchTermValue}) => {
-            render(fileContents, getFilters(searchTermValue));
-        });
+        const filteredLols = Bacon.combineWith((transactions, searchTermValue) => {
+            const filters = getFilters(searchTermValue);
+            return transactions
+                .filter(includesSomeSearchTerm(filters.searchTerms))
+                .filter(isBetween(filters.minDate, filters.maxDate))
+                .filter(isBetween(filters.minAmount, filters.maxAmount));
+        }, parsedFile, searchTerm)
+            .onValue(render);
     }
 
     main();
