@@ -73,7 +73,6 @@ const Op = function(moment) {
 }(moment);
 
 $(function () {
-    var Bank = Nordea;
     var config = Config;
 
     const isBetween = (min, max) => transaction =>
