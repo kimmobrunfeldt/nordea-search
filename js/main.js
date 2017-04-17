@@ -134,13 +134,14 @@ $(function () {
             })
             .map(event => event.target.result)
             .combine(bankRadioButton, (fileValue, bankRadio) => {
-                if (bankRadio === 'nordea') {
-                    return Nordea.parseTransactions(fileValue)
+                switch (bankRadio) {
+                    case 'nordea':
+                        return Nordea.parseTransactions(fileValue)
+                    case 'op':
+                        return Op.parseTransactions(fileValue)
+                    default:
+                        return [];
                 }
-                else if (bankRadio === 'op') {
-                    return Op.parseTransactions(fileValue)
-                }
-                return [];
             });
         const searchTerm = $('#filter-words')
             .asEventStream('keyup')
