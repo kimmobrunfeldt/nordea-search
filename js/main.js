@@ -122,6 +122,10 @@ $(function () {
     }
 
     function main() {
+        const bankRadioButton = $('[name="bank"]')
+            .asEventStream('change')
+            .map(event => event.target.value)
+            .toProperty('nordea');
         const file = $('#file')
             .asEventStream('change')
             .flatMap(event => {
@@ -130,26 +134,21 @@ $(function () {
                 return Bacon.fromEventTarget(reader, 'load');
             })
             .map(event => event.target.result)
-            .toProperty('');
+            .combine(bankRadioButton, (fileValue, bankRadio) => {
+                if (bankRadio === 'nordea') {
+                    return Nordea.parseTransactions(fileValue)
+                }
+                else if (bankRadio === 'op') {
+                    return Op.parseTransactions(fileValue)
+                }
+                return [];
+            });
         const searchTerm = $('#filter-words')
             .asEventStream('keyup')
             .debounce(200)
             .map(event => event.target.value)
             .toProperty('');
-        const bankRadioButton = $('[name="bank"]')
-            .asEventStream('change')
-            .map(event => event.target.value)
-            .toProperty('nordea');
-
-        const parsedFile = Bacon.combineWith((fileValue, bankRadio) => {
-            if (bankRadio === 'nordea') {
-                return Nordea.parseTransactions(fileValue)
-            }
-            else if (bankRadio === 'op') {
-                return Op.parseTransactions(fileValue)
-            }
-            return [];
-        }, file, bankRadioButton);
+        
 
         Bacon.combineWith((transactions, searchTermValue) => {
             const filters = getFilters(searchTermValue);
@@ -157,7 +156,7 @@ $(function () {
                 .filter(includesSomeSearchTerm(filters.searchTerms))
                 .filter(isBetween(filters.minDate, filters.maxDate))
                 .filter(isBetween(filters.minAmount, filters.maxAmount));
-        }, parsedFile, searchTerm)
+        }, file, searchTerm)
             .onValue(render);
     }
 
