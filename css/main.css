@@ -27,6 +27,7 @@ body {
   border: 0;
   color: #ffffff;
   font-size: 14px;
+  font-family: 'Droid Sans', sans-serif;
 }
 
 .tag-list::placeholder {
@@ -85,4 +86,5 @@ body {
 
 #file {
   color: #ffffff;
+  font-family: 'Droid Sans', sans-serif;
 }
