@@ -8,6 +8,13 @@ body {
   font-family: 'Droid Sans', sans-serif;
 }
 
+.main-header {
+  color: #ffffff;
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
 .transactions {
   list-style: none;
 }
@@ -70,4 +77,12 @@ body {
 
 .transaction-item__amount--income {
   color: #5CDD7A;
+}
+
+.radio-label {
+  color: #ffffff;
+}
+
+#file {
+  color: #ffffff;
 }
