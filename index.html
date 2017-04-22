@@ -12,16 +12,16 @@
   </head>
   <body>
     <div class="container">
-      <input type="file" id="file">
-      <label>
-        <input type="radio" name="bank" value="nordea" checked /> Nordea
-      </label>
-      <label>
-        <input type="radio" name="bank" value="op" /> OP
-      </label>
-      <input class="tag-list" id="filter-words" type="text" placeholder="Search terms separated with space: market bar..">
-      <div class="money-sum-box">
-        <p id="total">0€</p>
+      <div class="top-card">
+        <input type="file" id="file">
+        <label>
+          <input type="radio" name="bank" value="nordea" checked /> Nordea
+        </label>
+        <label>
+          <input type="radio" name="bank" value="op" /> OP
+        </label>
+        <input class="tag-list" id="filter-words" type="text" placeholder="Search terms separated with space: market bar..">
+        <span id="total">0€</span>
       </div>
       <ul class="transactions" id="filtered" />
     </div>
