@@ -1,14 +1,91 @@
-
-.transactions {
-    font-size: 10px;
-    font-family: Courier;
+* {
+  box-sizing: border-box;
 }
 
-.large-input {
-    width: 95%;
-    height: 100px;
+body {
+  background: #f2eafb;
+  padding: 15px;
+  font-family: 'Droid Sans', sans-serif;
+}
+
+.main-header {
+  color: #ffffff;
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.transactions {
+  list-style: none;
 }
 
 .tag-list {
-    width: 300px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 0;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: 'Droid Sans', sans-serif;
+}
+
+.tag-list::placeholder {
+  color: #ffffff;
+}
+
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 0 40px #999;
+}
+
+.top-card {
+  background: linear-gradient(to bottom left, #9C63C4, #322C59);
+  padding: 15px;
+}
+
+#total {
+  display: block;
+  font-size: 24px;
+  text-align: center;
+  color: #ffffff;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.transaction-item {
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.transaction-item__receiver {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.transaction-item__date {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.transaction-item__amount--expense {
+  color: #F57979;
+}
+
+.transaction-item__amount--income {
+  color: #5CDD7A;
+}
+
+.radio-label {
+  color: #ffffff;
+}
+
+#file {
+  color: #ffffff;
+  font-family: 'Droid Sans', sans-serif;
 }

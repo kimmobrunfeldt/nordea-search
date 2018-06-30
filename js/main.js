@@ -13,94 +13,105 @@ var Config = function() {
     return config;
 }();
 
-var Nordea = function($, _, moment) {
-    var api = {};
-
+const Nordea = function(moment) {
     function isLineTransaction(line) {
-        // If line is not empty and first word contains dot(it's a date)
-        return line && _.str.include(_.str.words(line)[0], '.');
+        const [date] = line.split('\t');
+        return moment(date, 'DD.MM.YYYY').isValid();
     }
 
     function parseTransactionLine(line) {
-        var words = _.str.words(line);
-        return {
-            date: moment(words[2], 'DD.MM.YYYY'),
-            amount: parseFloat(words[3].replace(',', '.')),
+        const [, ,
+            paymentDate,
+            amount,
+            receiver,
+            , ,
+            paymentType,
+        ] = line.split('\t');
 
-            // Remove the unnecessary dates from the beginning
-            line: _.str.words(line).slice(2).join(' ')
+        return {
+            date: moment(paymentDate, 'DD.MM.YYYY'),
+            amount: parseFloat(amount.replace(',', '.')),
+            receiver: paymentType.includes('otto') ? paymentType : receiver,
         };
     }
 
-    api.parseTransactions = function(text) {
-        var lines = _.str.lines(text);
-        var transactionLines = _.filter(lines, isLineTransaction);
-        return _.map(transactionLines, parseTransactionLine);
-    };
+    parseTransactions = text => text
+        .split('\n')
+        .filter(isLineTransaction)
+        .map(parseTransactionLine);
 
-    return api;
-}(jQuery, _, moment);
+    return {parseTransactions};
+}(moment);
 
+const Op = function(moment) {
+    function isLineTransaction(line) {
+        const [date] = line.split(';');
+        return moment(date, 'DD.MM.YYYY').isValid();
+    }
+
+    function parseTransactionLine(line) {
+        const [,
+            paymentDate,
+            amount,
+            , ,
+            receiver,
+        ] = line.split(';');
+
+        return {
+            date: moment(paymentDate, 'DD.MM.YYYY'),
+            amount: parseFloat(amount.replace(',', '.')),
+            receiver,
+        };
+    }
+
+    parseTransactions = text => text
+        .split('\n')
+        .filter(isLineTransaction)
+        .map(parseTransactionLine);
+
+    return {parseTransactions};
+}(moment);
 
 $(function () {
-    var Bank = Nordea;
     var config = Config;
 
-    function filterTransaction(transaction, filters) {
-        var caseSensitive = filters.caseSensitive;
-        var line = caseSensitive ? transaction.line : transaction.line.toLowerCase();
-        var wordsFound = _.map(filters.words, function(word) {
-            return _.str.include(line, word);
-        });
+    const isBetween = (min, max) => transaction =>
+        transaction.amount >= min && transaction.amount <= max;
 
-        return (_.any(wordsFound) || filters.words.length === 0) &&
-               isAmountInBoundaries(transaction, filters) &&
-               isDateInBoundaries(transaction, filters);
-    }
+    const includesSomeSearchTerm = searchTerms => transaction => {
+        return searchTerms.length ? searchTerms.some(searchTerm => {
+            return transaction.receiver.toLowerCase().includes(searchTerm.toLowerCase());
+        }) : true;
+    };
 
-    function isDateInBoundaries(transaction, filters) {
-        return (transaction.date >= filters.minDate) &&
-               (transaction.date <= filters.maxDate);
-    }
-
-    function isAmountInBoundaries(transaction, filters) {
-        return (transaction.amount >= filters.minAmount) &&
-               (transaction.amount <= filters.maxAmount);
-    }
-
-    function render(text, filters) {
-        var transactions = Bank.parseTransactions(text);
-        var filteredTransactions = _.filter(transactions, function(t) {
-            return filterTransaction(t, filters);
-        });
-
-        renderTransactionList(filteredTransactions);
-        renderTotalAmount(filteredTransactions);
+    function render(transactions) {
+        renderTransactionList(transactions);
+        renderTotalAmount(transactions);
     }
 
     function renderTransactionList(transactions) {
-        var context = {transactions: transactions};
-        var template = '<ul>   ' +
-            '<% _.each(transactions, function(transaction) { %>' +
-            '<li><pre><%= transaction.line %></pre></li>' +
-            '<% }) %>' +
-            '</ul>';
+        const template = transactions.reduce((acc, transaction) => {
+            const amountClass = transaction.amount > 0 ? 'transaction-item__amount--income' : 'transaction-item__amount--expense';
+            return acc + '<li class="transaction-item">' +
+                '<div class="transaction-item__left">' + 
+                    '<h4 class="transaction-item__receiver">' + transaction.receiver + '</h4>' + 
+                    '<time class="transaction-item__date">' + moment(transaction.date).format("LL") + '</time>' + 
+                '</div>' +
+                '<strong class="' + amountClass + '">' + transaction.amount.toFixed(2) + '</strong>' + 
+            '</li>';
+        }, '');
 
-        var html = _.template(template, context);
-        $('#filtered').html(html);
+        $('#filtered').html(template);
     }
 
     function renderTotalAmount(transactions) {
-        var total = _.reduce(transactions, function(memo, t) {
-            return memo + t.amount;
-        }, 0);
-
+        const total = transactions.reduce((memo, t) => memo + t.amount, 0);
         $('#total').text(total.toFixed(2) + ' ' + config.currencies[config.currency]);
     }
 
-    function getFilters() {
+    function getFilters(words) {
         return {
-            words: _.str.words($('#filter-words').val()),
+            searchTerms: words.split(' '),
             caseSensitive: false,
             minAmount: -Infinity,
             maxAmount: Infinity,
@@ -110,19 +121,43 @@ $(function () {
     }
 
     function main() {
-        var transactionBox = $("#transaction-box");
-        var textChanges = transactionBox.asEventStream("input propertychange");
-        var filterWordChanges = $("#filter-words").asEventStream("input propertychange");
+        const bankRadioButton = $('[name="bank"]')
+            .asEventStream('change')
+            .map(event => event.target.value)
+            .toProperty('nordea');
+        const file = $('#file')
+            .asEventStream('change')
+            .flatMap(event => {
+                const reader = new FileReader();
+                reader.readAsText(event.target.files[0]);
+                return Bacon.fromEventTarget(reader, 'load');
+            })
+            .map(event => event.target.result)
+            .combine(bankRadioButton, (fileValue, bankRadio) => {
+                switch (bankRadio) {
+                    case 'nordea':
+                        return Nordea.parseTransactions(fileValue)
+                    case 'op':
+                        return Op.parseTransactions(fileValue)
+                    default:
+                        return [];
+                }
+            });
+        const searchTerm = $('#filter-words')
+            .asEventStream('keyup')
+            .debounce(200)
+            .map(event => event.target.value)
+            .toProperty('');
+        
 
-        var allChanges = Bacon.mergeAll(textChanges, filterWordChanges);
-
-        // 300 ms after last change of anything, re-render info
-        allChanges.debounce(300).onValue(function(e) {
-            render(transactionBox.val(), getFilters());
-        });
-
-        // Initial render if the form happens to remember some values
-        render(transactionBox.val(), getFilters());
+        Bacon.combineWith((transactions, searchTermValue) => {
+            const filters = getFilters(searchTermValue);
+            return transactions
+                .filter(includesSomeSearchTerm(filters.searchTerms))
+                .filter(isBetween(filters.minDate, filters.maxDate))
+                .filter(isBetween(filters.minAmount, filters.maxAmount));
+        }, file, searchTerm)
+            .onValue(render);
     }
 
     main();
